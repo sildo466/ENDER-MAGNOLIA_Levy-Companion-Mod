@@ -1,0 +1,393 @@
+============================================================
+Levy AI Advanced Feature Configuration Guide
+============================================================
+
+This guide will help you configure the AI conversation feature.
+Once completed, you can have intelligent conversations with Levy in-game.
+
+【Important Notice】
+Before using the AI conversation feature, you must first talk to any NPC in the game.
+This is required to activate the game's dialog system.
+
+【Note】
+After talking to an NPC, you may temporarily lose control (cannot move, etc.).
+Solution: Press ESC to open the game menu, then click "Continue" to restore normal control.
+
+============================================================
+Step 1: Install Python (Skip if already installed)
+============================================================
+
+1. Go to https://www.python.org/downloads/
+2. Download Python 3.10 or higher
+3. During installation, make sure to check "Add Python to PATH"
+4. After installation, open Command Prompt (cmd) and type:
+   python --version
+   If a version number appears, installation is successful
+
+============================================================
+Step 2: Install Python Dependencies
+============================================================
+
+Open Command Prompt (cmd) and type:
+
+pip install requests
+pip install keyboard
+
+============================================================
+Step 3: Install Ollama
+============================================================
+
+1. Go to https://ollama.com/download
+2. Download and install Ollama
+3. After installation, Ollama will run automatically in the background
+
+============================================================
+Step 4: Download AI Model (Choose based on your VRAM)
+============================================================
+
+Open Command Prompt (cmd) and run the appropriate command based on your GPU VRAM:
+
+【4GB VRAM】
+
+ollama pull llama3.2:3b
+
+【8GB VRAM】
+
+ollama pull qwen3:8b
+ollama pull llama3.1:8b
+ollama pull kingzeus/llama-3.1-8b-darkidol
+ollama pull phi3
+
+【12GB VRAM】
+
+ollama pull qwen3:14b
+ollama pull qwen:14b
+ollama pull gemma3:12b
+ollama pull mistral-small3.2:24b
+
+【16GB VRAM】
+
+ollama pull qwen3:14b
+ollama pull gemma3:27b
+ollama pull mistral-small3.2:24b
+ollama pull huihui_ai/mistral-small-abliterated:24b
+
+【24GB+ VRAM】
+
+ollama pull gemma3:27b
+ollama pull mistral-small3.2:24b
+ollama pull huihui_ai/mistral-small-abliterated:24b
+ollama pull orieg/gemma3-tools:27b-it-qat
+
+【Verify download】
+
+ollama list
+You should see the downloaded models listed
+
+============================================================
+Step 5: Place Files
+============================================================
+
+1. Copy the LevyAI folder from the zip to your game root directory:
+
+   Example:
+   C:\Program Files (x86)\Steam\steamapps\common\ENDER MAGNOLIA\LevyAI\
+
+2. Copy the Mods/LevyAI folder from the zip to:
+
+   C:\Program Files (x86)\Steam\steamapps\common\ENDER MAGNOLIA\EnderMagnolia\Binaries\Win64\ue4ss\Mods\LevyAI\
+
+3. Open ue4ss/Mods/mods.txt and add this line:
+   LevyAI : 1
+
+============================================================
+Step 6: Configure config.ini
+============================================================
+
+1. Find your game installation path, for example:
+   C:\Program Files (x86)\Steam\steamapps\common\ENDER MAGNOLIA
+
+2. Open ue4ss/Mods/LevyAI/config.ini
+
+3. Modify the paths to match your actual installation (use forward slashes /):
+
+   [paths]
+   data_path=C:/Program Files (x86)/Steam/steamapps/common/ENDER MAGNOLIA/LevyAI/data/
+   post_py=C:/Program Files (x86)/Steam/steamapps/common/ENDER MAGNOLIA/LevyAI/post.py
+
+============================================================
+Step 7: Configure config.json (Important!)
+============================================================
+
+Open LevyAI/config.json. Below is the complete configuration guide:
+
+{
+    // Ollama server URL (usually no need to change)
+    "ollama_url": "http://localhost:11434/api/generate",
+
+    // Model name to use
+    // Fill in based on the model you downloaded in Step 4
+    // Example: downloaded qwen3:8b → "model": "qwen3:8b"
+    "model": "qwen3:8b",
+
+    // Temperature (0.0-2.0)
+    // Higher = more random/creative; Lower = more conservative/predictable
+    // Recommended: 0.6-0.8
+    "temperature": 0.6,
+
+    // Maximum number of tokens to generate
+    // Higher = longer replies but slower response time
+    // Recommended: 300-800
+    "num_predict": 500,
+
+    // Top-p sampling (0.0-1.0)
+    // Controls vocabulary diversity, recommended: 0.9
+    "top_p": 0.9,
+
+    // Repeat penalty (1.0-2.0)
+    // Higher = less repetition of words, recommended: 1.1
+    "repeat_penalty": 1.1,
+
+    // Request timeout (seconds)
+    // Increase if model responds slowly
+    "timeout": 120,
+
+    // Maximum number of conversation history entries to save
+    // Oldest entries are deleted when exceeded
+    "max_history": 20,
+
+    // Number of history entries to include in each request
+    // Higher = AI remembers more, but consumes more VRAM
+    // Recommended: 5-10
+    "context_history": 10,
+
+    // Maximum AI reply length (characters)
+    // Truncated with "..." if exceeded
+    // Game dialog has length limit, recommended: 40-80
+    "max_reply_length": 60,
+
+    // Enable thinking mode (reserved feature)
+    // Keep as false
+    "think": false,
+
+    // Polling interval for input.txt (seconds)
+    // Usually no need to change
+    "poll_interval": 0.2
+}
+
+【Common Configuration Adjustments】
+
+Scenario 1: Reply too short or too long
+→ Adjust "max_reply_length"
+
+Scenario 2: AI speaks too rigidly / too chaotically
+→ Lower temperature (more conservative) or raise (more creative)
+
+Scenario 3: AI repeats the same phrases
+→ Increase "repeat_penalty" to 1.2-1.3
+
+Scenario 4: AI doesn't remember previous conversation
+→ Increase "context_history" to 15-20 (watch VRAM usage)
+
+Scenario 5: Response too slow
+→ Lower "num_predict" to 300, or lower "context_history"
+
+============================================================
+Step 8: Launch
+============================================================
+
+1. Start Ollama (type: ollama serve)
+
+2. Navigate to the LevyAI directory and double-click start.bat
+
+3. Success looks like this:
+
+   ==================================================
+   Levy AI Bridge Started
+   Model:    qwen3:8b
+   Temperature: 0.6
+   num_predict: 500
+   Input:       .../input.txt
+   Output:      .../output.txt
+   Ollama status: OK (HTTP 200)
+
+   Waiting for player input...
+   ==================================================
+
+4. Keep this window open
+
+5. Launch the game
+
+6. After entering the game, talk to any NPC first (to activate the dialog system)
+
+7. Press Alt+8 to summon Levy
+
+8. Press Alt+F to open the input window and type your message,Do not send messages too frequently. Please wait a moment after talking to the NPC before sending the next message.
+
+
+
+============================================================
+Startup Sequence (Every Time)
+============================================================
+
+1. Start Ollama (type: ollama serve)
+2. Run python bridge.py (or double-click start.bat)
+3. Launch the game
+4. Talk to any NPC first
+5. Summon Levy and use AI chat
+
+============================================================
+Frequently Asked Questions
+============================================================
+
+Q: Why does AI chat not respond the first time?
+
+A: You need to talk to any NPC in the game first to activate the game's dialog system.
+
+Q: Controls become unresponsive after talking to an NPC (can't move, can't attack). How to fix?
+
+A: Press ESC to open the game menu, then click "Continue" to restore normal control.
+
+Q: bridge.py shows "Cannot reach Ollama"
+
+A: Open a new Command Prompt and type: ollama serve
+
+Q: Shows "ConnectionError" or "HTTP 404"
+
+A: Verify the ollama_url in config.json is correct
+   Usually: http://localhost:11434/api/generate
+
+Q: Input window doesn't appear
+
+A: Verify the post_py path in config.ini is correct
+
+Q: AI replies in a different language than I typed
+
+A: Check the language rules in prompts/system.txt
+
+Q: Replies contain garbled text or strange symbols
+
+A: Check that "max_reply_length" in config.json isn't too short
+   Or increase the "num_predict" value
+
+Q: AI doesn't remember previous conversation
+
+A: Check if "context_history" value is too low (recommended 5-10)
+   Or check if data/history.json exists
+
+Q: How to clear conversation history
+
+A: Press Alt+D while bridge.py is running, or manually delete history.json
+
+Q: Game crashes
+
+A: Disable AI feature (remove or comment out "LevyAI : 1" in mods.txt) and use only the basic follow feature
+
+Q: Dialog text doesn't show
+
+A: Make sure you have talked to any NPC first
+
+============================================================
+Custom Personality (Important! You can modify the prompt)
+============================================================
+
+You can freely modify Levy's personality, speaking style, knowledge scope, etc. by editing the prompt file:
+
+File location: LevyAI/prompts/system.txt
+
+Open with Notepad or any text editor to modify.
+
+【Backup Suggestion】
+
+Back up the original system.txt file before modifying, so you can restore it if needed.
+
+============================================================
+File Structure Reference
+============================================================
+
+Complete directory structure after installation:
+
+ENDER MAGNOLIA/
+├── LevyAI/
+│   ├── bridge.py           # Main bridge program
+│   ├── start.bat           # Startup script
+│   ├── post.py             # Input window
+│   ├── config.json         # AI configuration file
+│   ├── prompts/
+│   │   └── system.txt      # Character personality file (editable) ⭐
+│   └── data/
+│       ├── input.txt       # Cross-process communication (player input)
+│       ├── output.txt      # Cross-process communication (AI reply)
+│       └── history.json    # Conversation history
+└── EnderMagnolia/
+    └── Binaries/Win64/ue4ss/Mods/
+        ├── LevySummon/
+        │   └── Scripts/
+        │       └── main.lua
+        ├── LevyAI/
+        │   ├── config.ini  # Path configuration file
+        │   └── Scripts/
+        │       └── main.lua
+        └── mods.txt
+
+============================================================
+Model Recommendation Quick Reference
+============================================================
+
+VRAM: 4GB
+Recommended: llama3.2:3b
+Command: ollama pull llama3.2:3b
+
+VRAM: 8GB
+Recommended: qwen3:8b
+Command: ollama pull qwen3:8b
+
+Recommended: llama3.1:8b
+Command: ollama pull llama3.1:8b
+
+Recommended: kingzeus/llama-3.1-8b-darkidol
+Command: ollama pull kingzeus/llama-3.1-8b-darkidol
+
+Recommended: phi3
+Command: ollama pull phi3
+
+VRAM: 12GB
+Recommended: qwen3:14b
+Command: ollama pull qwen3:14b
+
+Recommended: qwen:14b
+Command: ollama pull qwen:14b
+
+Recommended: gemma3:12b
+Command: ollama pull gemma3:12b
+
+Recommended: mistral-small3.2:24b
+Command: ollama pull mistral-small3.2:24b
+
+VRAM: 16GB
+Recommended: qwen3:14b
+Command: ollama pull qwen3:14b
+
+Recommended: gemma3:27b
+Command: ollama pull gemma3:27b
+
+Recommended: mistral-small3.2:24b
+Command: ollama pull mistral-small3.2:24b
+
+Recommended: huihui_ai/mistral-small-abliterated:24b
+Command: ollama pull huihui_ai/mistral-small-abliterated:24b
+
+VRAM: 24GB+
+Recommended: gemma3:27b
+Command: ollama pull gemma3:27b
+
+Recommended: mistral-small3.2:24b
+Command: ollama pull mistral-small3.2:24b
+
+Recommended: huihui_ai/mistral-small-abliterated:24b
+Command: ollama pull huihui_ai/mistral-small-abliterated:24b
+
+Recommended: orieg/gemma3-tools:27b-it-qat
+Command: ollama pull orieg/gemma3-tools:27b-it-qat
+
+============================================================

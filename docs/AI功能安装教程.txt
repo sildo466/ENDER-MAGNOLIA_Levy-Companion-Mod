@@ -1,0 +1,372 @@
+============================================================
+Levy AI 高级功能配置教程
+============================================================
+
+本教程将指导您完成 AI 对话功能的配置。
+完成后，您可以在游戏中与露薇进行智能对话。
+
+============================================================
+第一步：安装 Python（如已安装可跳过）
+============================================================
+
+1. 前往 https://www.python.org/downloads/
+2. 下载 Python 3.10 或更高版本
+3. 安装时务必勾选 "Add Python to PATH"
+4. 安装完成后，打开命令提示符（cmd），输入：
+   python --version
+   如果显示版本号则安装成功
+
+============================================================
+第二步：安装 Python 依赖
+============================================================
+
+打开命令提示符（cmd），输入：
+
+pip install requests
+pip install keyboard
+
+============================================================
+第三步：安装 Ollama
+============================================================
+
+1. 前往 https://ollama.com/download
+2. 下载并安装 Ollama
+3. 安装完成后，Ollama 会自动在后台运行
+
+============================================================
+第四步：下载 AI 模型（根据你的显存选择）
+============================================================
+
+打开命令提示符（cmd），根据你的显卡显存选择下方对应命令：
+
+【4GB 显存】
+
+ollama pull llama3.2:3b
+
+【8GB 显存】
+
+ollama pull qwen3:8b
+ollama pull llama3.1:8b
+ollama pull kingzeus/llama-3.1-8b-darkidol
+ollama pull phi3
+
+【12GB 显存】
+
+ollama pull qwen3:14b
+ollama pull qwen:14b
+ollama pull gemma3:12b
+ollama pull mistral-small3.2:24b
+
+【16GB 显存】
+
+ollama pull qwen3:14b
+ollama pull gemma3:27b
+ollama pull mistral-small3.2:24b
+ollama pull huihui_ai/mistral-small-abliterated:24b
+
+【24GB+ 显存】
+
+ollama pull gemma3:27b
+ollama pull mistral-small3.2:24b
+ollama pull huihui_ai/mistral-small-abliterated:24b
+ollama pull orieg/gemma3-tools:27b-it-qat
+
+【下载完成后确认】
+
+ollama list
+应该能看到已下载的模型列表
+
+============================================================
+第五步：放置文件
+============================================================
+
+1. 将压缩包中的 LevyAI 文件夹放入游戏根目录：
+
+   例如：
+   C:\Program Files (x86)\Steam\steamapps\common\ENDER MAGNOLIA\LevyAI\
+
+2. 将压缩包中的 Mods/LevyAI 文件夹放入：
+
+   C:\Program Files (x86)\Steam\steamapps\common\ENDER MAGNOLIA\EnderMagnolia\Binaries\Win64\ue4ss\Mods\LevyAI\
+
+3. 打开 ue4ss/Mods/mods.txt，添加一行：
+   LevyAI : 1
+
+============================================================
+第六步：配置 config.ini
+============================================================
+
+1. 找到你的游戏安装路径，例如：
+   C:\Program Files (x86)\Steam\steamapps\common\ENDER MAGNOLIA
+
+2. 打开 ue4ss/Mods/LevyAI/config.ini
+
+3. 修改路径为你的实际路径（注意使用正斜杠 /）：
+
+   [paths]
+   data_path=C:/Program Files (x86)/Steam/steamapps/common/ENDER MAGNOLIA/LevyAI/data/
+   post_py=C:/Program Files (x86)/Steam/steamapps/common/ENDER MAGNOLIA/LevyAI/post.py
+
+============================================================
+第七步：配置 config.json（重要！）
+============================================================
+
+打开 LevyAI/config.json，以下是完整配置说明：
+
+{
+    // Ollama 服务器地址（通常不需要修改）
+    "ollama_url": "http://localhost:11434/api/generate",
+
+    // 使用的模型名称
+    // 根据你第四步下载的模型填写
+    // 示例：下载了 qwen3:8b → "model": "qwen3:8b"
+    "model": "qwen3:8b",
+
+    // 温度参数（0.0-2.0）
+    // 值越高回复越随机、有创意；值越低越保守、可预测
+    // 推荐：0.6-0.8
+    "temperature": 0.6,
+
+    // 最大生成 token 数
+    // 值越高回复可以越长，但响应时间也会增加
+    // 推荐：300-800
+    "num_predict": 500,
+
+    // Top-p 采样（0.0-1.0）
+    // 控制词汇选择的多样性，推荐：0.9
+    "top_p": 0.9,
+
+    // 重复惩罚（1.0-2.0）
+    // 值越高越不容易重复相同词语，推荐：1.1
+    "repeat_penalty": 1.1,
+
+    // 请求超时时间（秒）
+    // 如果模型回复较慢可以调高
+    "timeout": 120,
+
+    // 最大保存的历史对话条数
+    // 超过后会删除最早的对话
+    "max_history": 20,
+
+    // 每次请求携带的历史上下文条数
+    // 值越高 AI 记得越多，但显存消耗也越大
+    // 推荐：5-10
+    "context_history": 10,
+
+    // AI 回复的最大长度（字符数）
+    // 超过会被截断并添加 "..."
+    // 游戏对话框有长度限制，推荐：40-80
+    "max_reply_length": 60,
+
+    // 是否启用思考模式（预留功能）
+    // 保持 false 即可
+    "think": false,
+
+    // 轮询 input.txt 的间隔（秒）
+    // 通常不需要修改
+    "poll_interval": 0.2
+}
+
+【常用配置调整场景】
+
+场景1：回复太短或太长
+→ 调整 "max_reply_length"
+
+场景2：AI 说话太死板/太混乱
+→ 降低 temperature（更保守）或提高（更创意）
+
+场景3：AI 总是重复相同的话
+→ 提高 "repeat_penalty" 到 1.2-1.3
+
+场景4：AI 记不住之前的对话
+→ 提高 "context_history" 到 15-20（注意显存消耗）
+
+场景5：回复速度太慢
+→ 降低 "num_predict" 到 300，或降低 "context_history"
+
+============================================================
+第八步：启动
+============================================================
+
+1. 输入ollama serve启动ollama
+
+2. 进入 LevyAI 目录：
+ 
+
+3. 启动桥接程序：
+   点击start.bat
+
+4. 看到以下内容表示启动成功：
+
+   ==================================================
+   Levy AI Bridge Started
+   Model:    qwen3:8b
+   Temperature: 0.6
+   num_predict: 500
+   Input:       .../input.txt
+   Output:      .../output.txt
+   Ollama status: OK (HTTP 200)
+
+   Waiting for player input...
+   ==================================================
+
+5. 保持此窗口不要关闭
+
+6. 启动游戏
+
+7. 游戏中按 Alt+8 召唤露薇
+
+8. 按 Alt+F 打开输入框，输入想说的话，消息不要发送过于频繁，和NPC对话后请等一会儿在发消息
+
+============================================================
+每次使用的启动顺序
+============================================================
+
+1. 启动 Ollama（输入：ollama serve，有时会开机自启）
+2. 运行 python bridge.py
+3. 启动游戏
+
+============================================================
+常见问题
+============================================================
+
+Q: bridge.py 显示 "Cannot reach Ollama"
+
+A: 打开新的命令提示符，输入：ollama serve
+
+Q: 显示 "ConnectionError" 或 "HTTP 404"
+
+A: 确认 config.json 中的 ollama_url 是否正确
+   通常是 http://localhost:11434/api/generate
+
+Q: 输入框弹不出来
+
+A: 确认 config.ini 中 post_py 路径正确
+
+Q: AI 回复与我提问语言不同
+
+A: 检查提示词
+
+Q: 回复出现乱码或奇怪符号
+
+A: 检查 config.json 中的 "max_reply_length" 不要太短
+   或者提高 "num_predict" 值
+
+Q: AI 不记得之前的对话
+
+A: 检查 "context_history" 值是否太低（推荐 5-10）
+   或者检查 data/history.json 是否存在
+
+Q: 想清空对话历史
+
+A: 确保bridge.py运行时按Alt+D,或直接手动删掉history.json
+
+Q: 游戏崩溃
+
+A: 关闭 AI 功能（在 mods.txt 中删除或注释 LevyAI : 1），仅使用基础跟随功能
+
+============================================================
+自定义人设（重要！可自行修改提示词）
+============================================================
+
+你可以自由修改露薇的性格、说话方式、知识范围等，只需编辑提示词文件：
+
+文件位置：LevyAI/prompts/system.txt
+
+用记事本或任意文本编辑器打开即可修改。
+
+
+【备份建议】
+
+修改前建议备份原始 system.txt 文件，以便出问题时恢复。
+
+============================================================
+文件结构参考
+============================================================
+
+安装完成后的完整目录结构：
+
+ENDER MAGNOLIA/
+├── LevyAI/
+│   ├── bridge.py           # 主桥接程序
+│   ├── start.bat            #启动脚本
+│   ├── post.py             # 输入窗口
+│   ├── config.json         # AI 配置文件
+│   ├── prompts/
+│   │   └── system.txt      # 角色人设文件（可自行修改）⭐
+│   └── data/
+│       ├── input.txt       # 跨进程通信（玩家输入）
+│       ├── output.txt      # 跨进程通信（AI 回复）
+│       └── history.json    # 对话历史记录
+└── EnderMagnolia/
+    └── Binaries/Win64/ue4ss/Mods/
+        ├── LevySummon/
+        │   └── Scripts/
+        │       └── main.lua
+        ├── LevyAI/
+        │   ├── config.ini  # 路径配置文件
+        │   └── Scripts/
+        │       └── main.lua
+        └── mods.txt
+
+============================================================
+模型推荐速查表
+============================================================
+
+显存：4GB
+推荐模型：llama3.2:3b
+安装命令：ollama pull llama3.2:3b
+
+显存：8GB
+推荐模型：qwen3:8b
+安装命令：ollama pull qwen3:8b
+
+推荐模型：llama3.1:8b
+安装命令：ollama pull llama3.1:8b
+
+推荐模型：kingzeus/llama-3.1-8b-darkidol
+安装命令：ollama pull kingzeus/llama-3.1-8b-darkidol
+
+推荐模型：phi3
+安装命令：ollama pull phi3
+
+显存：12GB
+推荐模型：qwen3:14b
+安装命令：ollama pull qwen3:14b
+
+推荐模型：qwen:14b
+安装命令：ollama pull qwen:14b
+
+推荐模型：gemma3:12b
+安装命令：ollama pull gemma3:12b
+
+推荐模型：mistral-small3.2:24b
+安装命令：ollama pull mistral-small3.2:24b
+
+显存：16GB
+推荐模型：qwen3:14b
+安装命令：ollama pull qwen3:14b
+
+推荐模型：gemma3:27b
+安装命令：ollama pull gemma3:27b
+
+推荐模型：mistral-small3.2:24b
+安装命令：ollama pull mistral-small3.2:24b
+
+推荐模型：huihui_ai/mistral-small-abliterated:24b
+安装命令：ollama pull huihui_ai/mistral-small-abliterated:24b
+
+显存：24GB+
+推荐模型：gemma3:27b
+安装命令：ollama pull gemma3:27b
+
+推荐模型：mistral-small3.2:24b
+安装命令：ollama pull mistral-small3.2:24b
+
+推荐模型：huihui_ai/mistral-small-abliterated:24b
+安装命令：ollama pull huihui_ai/mistral-small-abliterated:24b
+
+推荐模型：orieg/gemma3-tools:27b-it-qat
+安装命令：ollama pull orieg/gemma3-tools:27b-it-qat
+
+============================================================
