@@ -1,0 +1,17 @@
+{
+    "ollama_url": "http://localhost:11434/api/generate",
+    "model": "",
+
+    "temperature": 0.6,
+    "num_predict": 500,
+    "top_p": 0.9,
+    "repeat_penalty": 1.1,
+    "timeout": 120,
+
+    "max_history": 20,
+    "context_history": 10,
+    "max_reply_length": 60,
+    "think": false,
+
+    "poll_interval": 0.2
+}
