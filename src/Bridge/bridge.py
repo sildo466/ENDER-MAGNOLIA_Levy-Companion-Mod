@@ -205,9 +205,8 @@ def main():
             if os.path.exists(INPUT_FILE):
                 with open(INPUT_FILE, "r", encoding="utf-8") as f:
                     current_input = f.read().strip()
-
-                print(f"[Debug] Read: '{current_input}' last='{last_input}'")
-
+                if current_input:
+                    print(f"[Debug] Read: '{current_input}' last='{last_input}'")
                 if current_input and current_input != last_input:
                     last_input = current_input
 
