@@ -36,33 +36,43 @@ end
 
 local CFG = LoadConfig()
 
-local DATA_PATH = CFG["data_path"]
-if not DATA_PATH or DATA_PATH == "" then
-    DATA_PATH = GetScriptDir() .. "../../../../../../LevyAI/data/"
+local function GetDataPath()
+    local data_path = nil
+    if CFG then
+        data_path = CFG["data_path"]
+    end
+    if not data_path or data_path == "" then
+        data_path = GetScriptDir() .. "../../../../../../LevyAI/data/"
+    end
+    data_path = data_path:gsub("\\", "/")
+    if not data_path:match("/$") then
+        data_path = data_path .. "/"
+    end
+    return data_path
 end
-DATA_PATH = DATA_PATH:gsub("\\", "/")
-if not DATA_PATH:match("/$") then DATA_PATH = DATA_PATH .. "/" end
 
-local POST_PY = CFG["post_py"]
-if not POST_PY or POST_PY == "" then
-    POST_PY = GetScriptDir() .. "../../../../../../LevyAI/post.py"
+local function GetPostPyPath()
+    local post_py = nil
+    if CFG then
+        post_py = CFG["post_py"]
+    end
+    if not post_py or post_py == "" then
+        post_py = GetScriptDir() .. "../../../../../../LevyAI/post.py"
+    end
+    post_py = post_py:gsub("\\", "/")
+    return post_py
 end
-POST_PY = POST_PY:gsub("\\", "/")
 
-local INPUT_FILE  = DATA_PATH .. "input.txt"
-local OUTPUT_FILE = DATA_PATH .. "output.txt"
+local function GetInputFilePath()
+    return GetDataPath() .. "input.txt"
+end
 
-print("[LevyAI] Input:   " .. INPUT_FILE)
-print("[LevyAI] Output:  " .. OUTPUT_FILE)
-print("[LevyAI] post.py: " .. POST_PY)
+local function GetOutputFilePath()
+    return GetDataPath() .. "output.txt"
+end
 
 local isWaitingReply = false
-local isDialogShown  = false
-
-local function utf8_to_lua(str)
-    if not str then return "" end
-    return str
-end
+local isDialogShown = false
 
 local function fix_encoding(str)
     if not str then return "" end
@@ -105,15 +115,14 @@ local function ParseAIReply(rawReply)
 end
 
 local function ReadOutput()
+    local OUTPUT_FILE = GetOutputFilePath()
     local f = io.open(OUTPUT_FILE, "rb")
     if f then
         local content = f:read("*a")
         f:close()
-        
         if content then
             content = fix_encoding(content)
             content = content:match("^%s*(.-)%s*$") or ""
-            
             if content ~= "" then
                 if not content:match("%[%w+%]") then
                     return ""
@@ -122,7 +131,6 @@ local function ReadOutput()
                     return ""
                 end
             end
-            
             return content
         end
     end
@@ -130,14 +138,16 @@ local function ReadOutput()
 end
 
 local function ClearOutput()
+    local OUTPUT_FILE = GetOutputFilePath()
     local f = io.open(OUTPUT_FILE, "w")
-    if f then 
-        f:write("") 
-        f:close() 
+    if f then
+        f:write("")
+        f:close()
     end
 end
 
 local function ReadInput()
+    local INPUT_FILE = GetInputFilePath()
     local f = io.open(INPUT_FILE, "rb")
     if f then
         local content = f:read("*a")
@@ -152,14 +162,17 @@ local function ReadInput()
 end
 
 local function ClearInput()
+    local INPUT_FILE = GetInputFilePath()
     local f = io.open(INPUT_FILE, "w")
-    if f then 
-        f:write("") 
-        f:close() 
+    if f then
+        f:write("")
+        f:close()
     end
 end
 
 local function OpenInputWindow()
+    local POST_PY = GetPostPyPath()
+    local INPUT_FILE = GetInputFilePath()
     local cmd = string.format(
         'start "" /B pythonw "%s" "%s"',
         POST_PY:gsub("/", "\\"),
@@ -171,11 +184,11 @@ end
 
 local function ShowDialog(bodyText, speakerName)
     local ok, tbs = pcall(function() return FindAllOf("TextBlock") end)
-    if not ok or not tbs then 
-        return false 
+    if not ok or not tbs then
+        return false
     end
 
-    local lineBlock    = nil
+    local lineBlock = nil
     local speakerBlock = nil
 
     for _, tb in ipairs(tbs) do
@@ -202,16 +215,15 @@ local function ShowDialog(bodyText, speakerName)
     end
 
     if not lineBlock then
-        print("[LevyAI] LineText not found")
         return false
     end
 
-    pcall(function() 
+    pcall(function()
         lineBlock:SetText(FText(bodyText))
     end)
     
     if speakerBlock then
-        pcall(function() 
+        pcall(function()
             speakerBlock:SetText(FText(speakerName or "露薇"))
         end)
     end
@@ -290,8 +302,8 @@ end
 
 local function SetLevyTalkAnim(animName)
     local ok, levys = pcall(function() return FindAllOf("BP_n7010_Levy_C") end)
-    if not ok or not levys then 
-        return 
+    if not ok or not levys then
+        return
     end
 
     for _, levy in ipairs(levys) do
@@ -319,7 +331,7 @@ local function WaitForInputAndSend()
     OpenInputWindow()
 
     local waitCount = 0
-    local gotInput  = false
+    local gotInput = false
 
     LoopAsync(200, function()
         waitCount = waitCount + 1
@@ -350,8 +362,9 @@ local function WaitForInputAndSend()
                 if pollCount > 133 then
                     ExecuteInGameThread(function()
                         if replyHandled then return end
-                        replyHandled   = true
+                        replyHandled = true
                         isWaitingReply = false
+                        print("[LevyAI] AI timeout")
                         HideDialog()
                         SetLevyTalkAnim("idle_a")
                     end)
@@ -366,14 +379,11 @@ local function WaitForInputAndSend()
                         return
                     end
 
-                    replyHandled   = true
+                    replyHandled = true
                     isWaitingReply = false
                     ClearOutput()
 
-                    print("[LevyAI] Raw reply: " .. reply)
-
                     local mood, replyText = ParseAIReply(reply)
-                    print("[LevyAI] Mood: " .. mood .. ", Text: " .. replyText)
 
                     local shown = ShowDialog(replyText, "露薇")
 
@@ -426,6 +436,6 @@ RegisterKeyBind(Key.F12, { ModifierKey.ALT }, function()
     end)
 end)
 
-print("[LevyAI] Loaded ")
-print("[LevyAI] Alt+F   = Talk to Levy")
+print("[LevyAI] Loaded")
+print("[LevyAI] Alt+F = Talk to Levy")
 print("[LevyAI] Alt+F12 = Force close dialog")
