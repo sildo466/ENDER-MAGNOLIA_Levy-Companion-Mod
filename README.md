@@ -1,3 +1,4 @@
+
 # Levy Companion Mod - ENDER MAGNOLIA
 
 让露薇（Levy）作为你的伙伴跟随你冒险，还能与她进行智能对话！
@@ -201,3 +202,10 @@ A: Press Alt+D or manually delete LevyAI/data/history.json
 ## Dependencies
 - [UE4SS](https://github.com/UE4SS-RE/RE-UE4SS) 
 
+---
+
+## 图片展示/Visual Presentation
+
+<img width="854" height="480" alt="picture2" src="https://github.com/user-attachments/assets/ab74718f-77bd-455b-a886-ec8fef7f96d3" />
+
+<img width="854" height="480" alt="picture" src="https://github.com/user-attachments/assets/ab474d25-3bb1-40a2-990b-2d56e06fd9d9" />
