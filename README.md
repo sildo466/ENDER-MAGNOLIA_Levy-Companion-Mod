@@ -3,6 +3,16 @@
 让露薇（Levy）作为你的伙伴跟随你冒险，还能与她进行智能对话！
 
 ---
+ **⚠️ 实验性项目 / Experimental Project**
+
+本项目目前处于实验性阶段，已知存在较多 Bug 和不稳定问题。
+功能可能无法按预期工作，甚至可能导致游戏崩溃。
+请谨慎使用，建议在测试环境运行。
+
+
+This project is currently experimental with known bugs and stability issues.
+Features may not work as expected and may even cause game crashes.
+Please use with caution, preferably in a test environment.
 
 ## 功能
 
@@ -48,7 +58,7 @@
 
 ---
 
-## AI 智能对话配置（核心功能）
+## AI 智能对话配置（实验性）
 
 让露薇接入本地 AI 大模型，实现真正的智能对话。
 
@@ -143,7 +153,7 @@ Let Levy accompany you on your adventure and have intelligent conversations with
 
 ---
 
-## AI Smart Dialogue Configuration (Core Feature)
+## AI Smart Dialogue Configuration (Experimental)
 
 Connect Levy to a local AI large language model for true intelligent conversations.
 
